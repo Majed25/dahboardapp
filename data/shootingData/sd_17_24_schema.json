@@ -1,0 +1,114 @@
+{
+    "Rk": {
+        "dt": "int",
+        "description": "Player ranking (potentially subjective)"
+    },
+    "Player": {
+        "dt": "str",
+        "description": "Player's full name"
+    },
+    "Nation": {
+        "dt": "str",
+        "description": "Player's nationality"
+    },
+    "Pos": {
+        "dt": "str",
+        "description": "Player's position on the field (e.g., Defender, Midfielder)"
+    },
+    "Squad": {
+        "dt": "str",
+        "description": "Club team the player is playing for"
+    },
+    "Comp": {
+        "dt": "str",
+        "description": "Competition the player is participating in (e.g., League, Cup)"
+    },
+    "Age": {
+        "dt": "int",
+        "description": "Player's current age"
+    },
+    "Born": {
+        "dt": "int",
+        "description": "Year of birth (integer) or a String representation"
+    },
+    "90s": {
+        "dt": "float",
+        "description": "90s played"
+    },
+    "Gls": {
+        "dt": "int",
+        "description": "Total number of goals scored"
+    },
+    "Sh": {
+        "dt": "int",
+        "description": "Total number of shots taken"
+    },
+    "SoT": {
+        "dt": "int",
+        "description": "Total number of shots on target"
+    },
+    "SoT%": {
+        "dt": "float",
+        "description": "Percentage of shots on target (SoT / Sh * 100)"
+    },
+    "Sh/90": {
+        "dt": "float",
+        "description": "Average number of shots per 90 minutes"
+    },
+    "SoT/90": {
+        "dt": "float",
+        "description": "Average number of shots on target per 90 minutes"
+    },
+    "G/Sh": {
+        "dt": "float",
+        "description": "Goals per shot ratio (Gls / Sh)"
+    },
+    "G/SoT": {
+        "dt": "float",
+        "description": "Goals per shot on target ratio (Gls / SoT)"
+    },
+    "Dist": {
+        "dt": "str",
+        "description": "Average distance of shots taken (unit dependent)"
+    },
+    "FK": {
+        "dt": "int",
+        "description": "Number of shots taken from free kicks"
+    },
+    "PK": {
+        "dt": "int",
+        "description": "Number of successful penalty kicks taken"
+    },
+    "PKatt": {
+        "dt": "int",
+        "description": "Total number of penalty kicks attempted"
+    },
+    "xG": {
+        "dt": "float",
+        "description": "Expected Goals (statistical estimate of goals scored)"
+    },
+    "npxG": {
+        "dt": "float",
+        "description": "Non-Penalty Expected Goals (xG excluding penalties)"
+    },
+    "npxG/Sh": {
+        "dt": "float",
+        "description": "Non-Penalty Expected Goals per Shot"
+    },
+    "G-xG": {
+        "dt": "float",
+        "description": "Difference between actual goals and expected goals"
+    },
+    "np:G-xG": {
+        "dt": "float",
+        "description": "Difference between non-penalty goals and non-penalty expected goals"
+    },
+    "Matches": {
+        "dt": "int",
+        "description": "Number of matches played"
+    },
+    "season": {
+        "dt": "str",
+        "description": "Season"
+    }
+}
