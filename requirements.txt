@@ -3,3 +3,6 @@ numpy==1.26.4
 flask==2.2.2
 gunicorn
 Werkzeug==2.2.2
+requests==2.32.2
+Flask-Caching==2.3.0
+
