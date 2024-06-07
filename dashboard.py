@@ -13,6 +13,7 @@ def dashboard():
     # make data frame from Scraping API
     response = requests.get(shooting_url)
     if response.status_code == 200:
+        print("is running")
         # Parse the JSON response
         json_data = response.json()
         #print(json_data)
@@ -100,7 +101,6 @@ def dashboard():
     mask = merged_df['Fee'].str.match(pattern)
     merged_df['Fee'] = merged_df['Fee'].where(mask, other='0')
 
-
     merged_df['Fee'] = merged_df.loc[:, 'Fee'].apply(_convert_money)
     merged_df.rename(columns={'Fee': 'Fee in €k'}, inplace=True)
     merged_df.dropna(subset=['Gls'], inplace=True)  # Drop rows with NaN values in specified column
@@ -156,7 +156,11 @@ def dashboard():
 
     with open('index.html', 'w') as f:
         f.write(html_template)
+    #Store df as json
 
+    json_path = 'data/dashboard.json'
+    dashboard_df.to_json(json_path)
+    return dashboard_df
 
 def _crop(x):
     first_word = x.split()[0]
@@ -175,5 +179,3 @@ def _convert_money(money_str):
 
 
 
-
-dashboard()

@@ -1,25 +1,55 @@
 import os
-from dashboard import dashboard
 from flask import (Flask, Markup, redirect, render_template, request,
                    send_from_directory, url_for, jsonify)
 from flask_caching import Cache
+import dash
+import pandas as pd
+from dash import dcc, html, dash_table, Input, Output, Dash
+import plotly.express as px
+import dash_bootstrap_components as dbc
+from dashboard import dashboard
+from app_layout import app_layout
+from update_dashboard import update_dashboard
+
 
 # Initializing my Flask app
-app = Flask(__name__)
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+server = Flask(__name__)
+cache = Cache(server, config={'CACHE_TYPE': 'simple'})
 
-# Generating
-@app.route('/')
+# Initialize Dash app
+app = Dash(__name__, server=server, url_base_pathname='/', external_stylesheets=[dbc.themes.BOOTSTRAP])
+dashboard_json = 'data/dashboard.json'
+dashboard_df = pd.read_json(dashboard_json)
+
+
+# Define the app layout
+app.layout = app_layout(dashboard_df)
+# Callback to update the bar chart and table based on league filter
+@app.callback(
+    [Output('bar-chart', 'figure'),
+     Output('data-table', 'data')],
+    [Input('league-filter', 'value')]
+)
 @cache.cached(timeout=3600*4)
-def index():
-    print("Cache Missed: serving from file")
-    with open('index.html', 'r') as f:
-        content = f.read()
-    return Markup(content)
+def update_layout(selected_league):
+    print('Not serving cache')
+    fig, data = update_dashboard(selected_league, dashboard_df)
+    return fig, data
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
+# Webhook endpoint to refresh the dashboard
+@server.route('/refresh-dashboard', methods=['POST'])
+def refresh_dashboard():
+    global dashboard_df
+    # Update the dashboard JSON file
     dashboard()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    dashboard_df = pd.read_json(dashboard_json)
+    # Clear the cache
+    cache.clear()
+    return jsonify({'status': 'success', 'message': 'Dashboard refreshed successfully'})
+
+# Run the app
+if __name__ == '__main__':
+    app.run_server(debug=False)
+
+
 
