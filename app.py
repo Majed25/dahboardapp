@@ -2,10 +2,8 @@ import os
 from flask import (Flask, Markup, redirect, render_template, request,
                    send_from_directory, url_for, jsonify)
 from flask_caching import Cache
-import dash
 import pandas as pd
-from dash import dcc, html, dash_table, Input, Output, Dash
-import plotly.express as px
+from dash import Input, Output, Dash
 import dash_bootstrap_components as dbc
 from dashboard import dashboard
 from app_layout import app_layout
