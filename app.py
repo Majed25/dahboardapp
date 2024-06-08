@@ -1,6 +1,5 @@
 import os
-from flask import (Flask, Markup, redirect, render_template, request,
-                   send_from_directory, url_for, jsonify)
+from flask import Flask, jsonify
 from flask_caching import Cache
 import pandas as pd
 from dash import Input, Output, Dash
