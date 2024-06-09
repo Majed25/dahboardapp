@@ -20,7 +20,7 @@ dashboard_df = pd.read_json(dashboard_json)
 
 dash_app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app = dash_app.server
-#cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 
 # Define the app layout
@@ -31,7 +31,7 @@ dash_app.layout = app_layout(dashboard_df)
      Output('data-table', 'data')],
     [Input('league-filter', 'value')]
 )
-#@cache.cached(timeout=3600*4)
+@cache.cached(timeout=3600*4)
 def update_layout(selected_league):
     print('Not serving cache')
     fig, data = update_dashboard(selected_league, dashboard_df)
@@ -54,8 +54,5 @@ def refresh_dashboard():
 # Run the app
 if __name__ == '__main__':
     print('cache not served')
-    dashboard()
-    dash_app.run_server(debug=True)
-
-
-
+    #dashboard()
+    dash_app.run_server(debug=True, host='0.0.0.0', port='5000')
