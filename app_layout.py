@@ -11,7 +11,7 @@ def app_layout(dashboard_df):
             clearable=False,
             placeholder='Select a league'
         ))),
-
+        dbc.Row(dbc.Col(html.Div(id='last-refreshed', style={'margin-top': '12px'}))),
         dbc.Row(dbc.Col(html.H2(children='Most Important Transfer Deals Based on Cost per Goal Scored', className='mt-4'))),
 
         dbc.Row(dbc.Col(dcc.Graph(
