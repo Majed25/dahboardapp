@@ -65,3 +65,5 @@ def refresh_dashboard():
 if __name__ == '__main__':
     cache.clear()
     dash_app.run_server(debug=True, host='0.0.0.0', port='5000')
+
+
