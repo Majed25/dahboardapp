@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 
 # Run the Dahsboard funciton to generate data and create my df
-#dashboard()
+dashboard()
 dashboard_json= 'data/dashboard.json'
 dashboard_df = pd.read_json(dashboard_json)
 last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
@@ -52,9 +52,11 @@ def refresh_dashboard():
     global last_refreshed
     # Update the dashboard JSON file
     dashboard()
+    print('refreshed')
     dashboard_df = pd.read_json(dashboard_json)
     #Clear the cache
     cache.clear()
+    print('cleared')
     last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
     return json.dumps({'status': 'success', 'message': 'Dashboard refreshed successfully'})
 

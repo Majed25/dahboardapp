@@ -147,17 +147,6 @@ def dashboard():
     start_index = html_table.find('<th>')
     end_index = html_table.find('</tbody>')
     html_table_body = html_table[start_index:end_index]
-
-    # Save the HTML table to a file
-    with open('template.html', 'r') as f:
-        html_template = f.read()
-
-    html_template = html_template.format(table=html_table_body)
-
-    with open('index.html', 'w') as f:
-        f.write(html_template)
-    #Store df as json
-
     json_path = 'data/dashboard.json'
     dashboard_df.to_json(json_path)
     return dashboard_df
