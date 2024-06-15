@@ -10,11 +10,11 @@ import json
 from datetime import datetime
 
 # Run the Dahsboard funciton to generate data and create my df
-dashboard()
-dashboard_json= 'data/dashboard.json'
-dashboard_df = pd.read_json(dashboard_json)
-last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
-
+dashboard_df, last_refreshed = None, None
+def generate_data(file):
+    dashboard_df = pd.read_json(file)
+    last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
+    return dashboard_df, last_refreshed
 # Initialize Dash app
 dash_app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app = dash_app.server
@@ -28,7 +28,7 @@ cache = Cache(app, config={
 app.config.suppress_callback_exceptions = True
 
 # Define the app layout
-dash_app.layout = app_layout(dashboard_df)
+dash_app.layout = app_layout(generate_data('data/dashboard.json')[0])
 
 # Callback to update the bar chart and table based on league filter
 @callback(
@@ -40,30 +40,29 @@ dash_app.layout = app_layout(dashboard_df)
 @cache.memoize(timeout=3600*4)  # in seconds
 def update_layout(selected_league):
     print('No cache callbacks')
-    fig, data = update_dashboard(selected_league, dashboard_df)
-    global last_refreshed
+    fig, data = update_dashboard(selected_league, generate_data('data/dashboard.json')[0])
+    last_refreshed = generate_data('data/dashboard.json')[1]
     timestamp = f'Last refreshed: {last_refreshed}'
     return fig, data, timestamp
 
 # Webhook endpoint to refresh the dashboard
 @app.route('/refresh_dashboard', methods=['POST'])
 def refresh_dashboard():
-    global dashboard_df
-    global last_refreshed
+    global dashboard_df, last_refreshed
     # Update the dashboard JSON file
     dashboard()
     print('refreshed')
-    dashboard_df = pd.read_json(dashboard_json)
+    dashboard_df, last_refreshed = generate_data('data/dashboard.json')
     #Clear the cache
     cache.clear()
     print('cleared')
-    last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
     return json.dumps({'status': 'success', 'message': 'Dashboard refreshed successfully'})
 
 
 # Run the app
 if __name__ == '__main__':
     cache.clear()
+    dashboard()
     dash_app.run_server(debug=True, host='0.0.0.0', port='5000')
 
 
