@@ -20,10 +20,13 @@ dash_app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 app = dash_app.server
 
 # Configure Caching
+cache_dir = os.environ.get('filesystem', 'data/cache')
+if not os.path.exists(cache_dir):
+    os.makedirs(cache_dir)
 cache = Cache(app, config={
     # try 'filesystem' if you don't want to setup redis
     'CACHE_TYPE': 'filesystem',
-    'CACHE_DIR': os.environ.get('filesystem', 'data/cache')
+    'CACHE_DIR': cache_dir
 })
 app.config.suppress_callback_exceptions = True
 
