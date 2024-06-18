@@ -4,6 +4,7 @@ import numpy as np
 import re
 from io import StringIO
 import requests
+import os
 
 # open shooting data and clean data
 def dashboard():
@@ -147,6 +148,9 @@ def dashboard():
     start_index = html_table.find('<th>')
     end_index = html_table.find('</tbody>')
     html_table_body = html_table[start_index:end_index]
+    data_dir = 'data/'
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
     json_path = 'data/dashboard.json'
     dashboard_df.to_json(json_path)
     return dashboard_df
