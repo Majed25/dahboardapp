@@ -44,7 +44,8 @@ def def_layout(app):
     Output('last-refreshed', 'children')],
     [Input('league-filter', 'value')]
 )
-@cache.memoize(timeout=3600*4)  # in seconds
+@cache.memoize(timeout=3600*4)
+# in seconds
 def update_layout(selected_league):
     print('No cache callbacks')
     fig, data = update_dashboard(selected_league, generate_data('data/dashboard.json')[0])
@@ -69,11 +70,12 @@ def refresh_dashboard():
 # Run the app
 if __name__ == '__main__':
     print('running entire file')
-    dashboard()
+    #dashboard()
     #clear cache
     print('Clear cache')
     cache.clear()
     def_layout(app)
-    app.run_server()
+    app.run_server(host='0.0.0.0')
+
 
 
