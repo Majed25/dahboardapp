@@ -23,7 +23,7 @@ app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 # Configure Cache
-cache_dir = os.environ.get('filesystem', 'Data/cache')
+cache_dir = os.environ.get('filesystem', 'data/cache')
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
 cache = Cache(server, config={

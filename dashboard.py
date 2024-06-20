@@ -26,7 +26,7 @@ def dashboard():
         return
 
     # make a schema for the data frame
-    with open('Data/shootingData/sd_17_24_schema.json', 'r') as f:
+    with open('data/shootingData/sd_17_24_schema.json', 'r') as f:
         schema = json.load(f)
 
     # store the dictionary for data types only
@@ -43,7 +43,7 @@ def dashboard():
     sch_ = [i for i in dict.keys()]
     hdrs = [i for i in df.columns]
     comparison_bool = (hdrs == sch_)
-    #print(f'Data frame and Schema matching: {comparison_bool}')
+    #print(f'data frame and Schema matching: {comparison_bool}')
 
     # checking all the columns that should be numerical or strings
     int_columns = [col for col, value in schema.items() if value['dt'] == 'int']
