@@ -70,7 +70,7 @@ def refresh_dashboard():
 # Run the app
 if __name__ == '__main__':
     print('running entire file')
-    #dashboard()
+    dashboard()
     #clear cache
     print('Clear cache')
     cache.clear()
