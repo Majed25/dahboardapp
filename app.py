@@ -11,19 +11,22 @@ from datetime import datetime
 
 # Run the Dahsboard funciton to generate data and create my df
 dashboard_df, last_refreshed = None, None
+
 def generate_data(file):
     dashboard_df = pd.read_json(file)
     last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
     return dashboard_df, last_refreshed
-# Initialize Dash app
-dash_app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
-app = dash_app.server
 
-# Configure Caching
+
+# Initialize Dash app
+app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
+
+# Configure Cache
 cache_dir = os.environ.get('filesystem', 'Data/cache')
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
-cache = Cache(app, config={
+cache = Cache(server, config={
     # try 'filesystem' if you don't want to setup redis
     'CACHE_TYPE': 'filesystem',
     'CACHE_DIR': cache_dir
@@ -31,7 +34,8 @@ cache = Cache(app, config={
 app.config.suppress_callback_exceptions = True
 
 # Define the app layout
-dash_app.layout = app_layout(generate_data('data/dashboard.json')[0])
+def def_layout(app):
+    app.layout = app_layout(generate_data('data/dashboard.json')[0])
 
 # Callback to update the bar chart and table based on league filter
 @callback(
@@ -49,7 +53,7 @@ def update_layout(selected_league):
     return fig, data, timestamp
 
 # Webhook endpoint to refresh the dashboard
-@app.route('/refresh_dashboard', methods=['POST'])
+@server.route('/refresh_dashboard', methods=['POST'])
 def refresh_dashboard():
     global dashboard_df, last_refreshed
     # Update the dashboard JSON file
@@ -64,8 +68,12 @@ def refresh_dashboard():
 
 # Run the app
 if __name__ == '__main__':
-    cache.clear()
+    print('running entire file')
     dashboard()
-    dash_app.run_server(debug=True, host='0.0.0.0', port='5000')
+    #clear cache
+    print('Clear cache')
+    cache.clear()
+    def_layout(app)
+    app.run_server()
 
 
