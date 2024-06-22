@@ -5,6 +5,7 @@ import re
 from io import StringIO
 import requests
 import os
+import logging
 
 # open shooting data and clean data
 def dashboard():
@@ -14,7 +15,7 @@ def dashboard():
     # make data frame from Scraping API
     response = requests.get(shooting_url)
     if response.status_code == 200:
-        print("is running")
+        logging.info(f'success getting {shooting_url}')
         # Parse the JSON response
         json_data = response.json()
         #print(json_data)
@@ -22,7 +23,7 @@ def dashboard():
         json_data = StringIO(json_data['data_table'])
         df = pd.read_json(json_data)
     else:
-        print("Failed to retrieve data:", response.status_code)
+        logging.error(f"Failed to retrieve data: {shooting_url}", response.status_code)
         return
 
     # make a schema for the data frame
@@ -36,14 +37,12 @@ def dashboard():
     _df = df[pd.to_numeric(df['Rk'], errors='coerce').isna()]
     df = df.drop(_df.index)
 
-
     # Format numerical values
-
     ## Compare the schema with the df headers
     sch_ = [i for i in dict.keys()]
     hdrs = [i for i in df.columns]
     comparison_bool = (hdrs == sch_)
-    #print(f'data frame and Schema matching: {comparison_bool}')
+    logging.debug(f'data frame and Schema matching: {comparison_bool}')
 
     # checking all the columns that should be numerical or strings
     int_columns = [col for col, value in schema.items() if value['dt'] == 'int']
@@ -62,17 +61,18 @@ def dashboard():
     shoot_df = df.loc[:, columns_to_keep]
     # normalize season column fro both dataframes
     shoot_df['season'] = shoot_df['season'] - 1
-
+    logging.debug(f'Normalized Season is: {shoot_df['season']}')
     # Process transfers data
     response = requests.get(tfr_url)
     if response.status_code == 200:
+        logging.info(f'success getting {tfr_url}')
         # Parse the JSON response
         json_data = response.json()
         # Convert the JSON data to a DataFrame
         json_data = StringIO(json_data['data_table'])
         tfr_df = pd.read_json(json_data)
     else:
-        print("Failed to retrieve data:", response.status_code)
+        logging.error(f'error getting {tfr_url}')
         return
 
     columns_to_keep = ['In', 'Pos', 'Market value', 'previous_team', 'Fee', 'current_team', 'season']
@@ -89,19 +89,20 @@ def dashboard():
     shoot_df_2023 = shoot_df[shoot_df['season'] == 2023]
     tfr_df_2023 = tfr_df[tfr_df['season'] == 2023]
 
+    # normalize players names
     tfr_df_2023['Player'] = tfr_df_2023['Player'].apply(lambda x: re.sub(r'(.)\.(.*)', '', x))
     # tfr_df_2023.loc[:, 'Player'] = tfr_df_2023['Player'].apply(lambda x: re.sub(r'(.)\.(.*)', '', x))
 
-
     tfr_df_2023['Player'] = tfr_df_2023.loc[:, 'Player'].apply(lambda x: _crop(x))
     tfr_df_2023 = tfr_df_2023.drop_duplicates(subset='Player')
-
+    # merge shooting and transfers data frames on unique players names
     merged_df = pd.merge(tfr_df_2023, shoot_df_2023, on='Player', how='left')
+
+    # normalize currencies
     merged_df['Fee'].unique()
     pattern = r'^€'
     mask = merged_df['Fee'].str.match(pattern)
     merged_df['Fee'] = merged_df['Fee'].where(mask, other='0')
-
     merged_df['Fee'] = merged_df.loc[:, 'Fee'].apply(_convert_money)
     merged_df.rename(columns={'Fee': 'Fee in €k'}, inplace=True)
     merged_df.dropna(subset=['Gls'], inplace=True)  # Drop rows with NaN values in specified column
@@ -109,6 +110,7 @@ def dashboard():
     merged_df['Rank'] = (merged_df.loc[:, 'Fee in €k'] / merged_df['Gls']).round(2)
     merged_df = merged_df.sort_values(by='Rank')
     dashboard_df = merged_df[(merged_df['Gls'] > 5) & (merged_df['Rank'] > 0)]
+    logging.info('setting fillters for players who score + 5 goals')
     dashboard_df = dashboard_df.reset_index(drop=True)
     dashboard_df.index += 1
     columns_to_keep = ['Player', 'Pos_x', 'current_team', 'previous_team',
@@ -169,6 +171,3 @@ def _convert_money(money_str):
         elif 'k' in money_str:
             return float(money_str.replace('€', '').replace('k', ''))
     return 0
-
-
-

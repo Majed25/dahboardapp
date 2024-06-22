@@ -8,19 +8,29 @@ from app_layout import app_layout
 from update_dashboard import update_dashboard
 import json
 from datetime import datetime
+import logging
+
+
+# configure logging
+logging.basicConfig(filename='app.log', level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+
+
 
 # Run the Dahsboard funciton to generate data and create my df
 dashboard_df, last_refreshed = None, None
 
 def generate_data(file):
-    dashboard_df = pd.read_json(file)
-    last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
-    return dashboard_df, last_refreshed
+    try:
+        dashboard_df = pd.read_json(file)
+        return dashboard_df
+    except Exception as e:
+        app.logger.info(f'Error loading file: {e}')
 
 
 # Initialize Dash app
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
+app.logger.info('Starting App')
 
 # Configure Cache
 cache_dir = os.environ.get('filesystem', 'data/cache')
@@ -35,7 +45,10 @@ app.config.suppress_callback_exceptions = True
 
 # Define the app layout
 def def_layout(app):
-    app.layout = app_layout(generate_data('data/dashboard.json')[0])
+    try:
+        app.layout = app_layout(generate_data('data/dashboard.json'))
+    except Exception as e:
+        app.logger.info(f'Error setting up app layout: {e}')
 
 # Callback to update the bar chart and table based on league filter
 @callback(
@@ -47,9 +60,10 @@ def def_layout(app):
 @cache.memoize(timeout=3600*4)
 # in seconds
 def update_layout(selected_league):
-    print('No cache callbacks')
-    fig, data = update_dashboard(selected_league, generate_data('data/dashboard.json')[0])
-    last_refreshed = generate_data('data/dashboard.json')[1]
+    app.logger.info('Update filters')
+    global last_refreshed
+    app.logger.info('No cache Served')
+    fig, data = update_dashboard(selected_league, generate_data('data/dashboard.json'))
     timestamp = f'Last refreshed: {last_refreshed}'
     return fig, data, timestamp
 
@@ -58,24 +72,30 @@ def update_layout(selected_league):
 def refresh_dashboard():
     global dashboard_df, last_refreshed
     # Update the dashboard JSON file
-    dashboard()
-    print('refreshed')
-    dashboard_df, last_refreshed = generate_data('data/dashboard.json')
-    #Clear the cache
-    cache.clear()
-    print('cleared')
-    return json.dumps({'status': 'success', 'message': 'Dashboard refreshed successfully'})
+    try:
+        dashboard()
+        app.logger.info('Dashboard refreshed')
+        dashboard_df = generate_data('data/dashboard.json')
+        last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
+        #Clear the cache
+        cache.clear()
+        print('cleared')
+        return json.dumps({'status': 'success', 'message': 'Dashboard refreshed successfully'})
+    except Exception as e:
+        app.logger.error('Error when refreshing dahsboard: {e}')
 
 
 # Run the app
 if __name__ == '__main__':
-    print('running entire file')
-    dashboard()
+    logging.info('Start app')
+    #dashboard()
+    last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
     #clear cache
-    print('Clear cache')
+    logging.info('Clear previous cache')
     cache.clear()
     def_layout(app)
     app.run_server(host='0.0.0.0')
+
 
 
 
