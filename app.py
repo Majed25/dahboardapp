@@ -95,7 +95,3 @@ if __name__ == '__main__':
     cache.clear()
     def_layout(app)
     app.run_server(host='0.0.0.0')
-
-
-
-
