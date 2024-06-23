@@ -88,7 +88,7 @@ def refresh_dashboard():
 # Run the app
 if __name__ == '__main__':
     logging.info('Start app')
-    #dashboard()
+    dashboard()
     last_refreshed = datetime.now().strftime('%Y-%m-%d %H:%M')
     #clear cache
     logging.info('Clear previous cache')
