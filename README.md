@@ -6,6 +6,12 @@ This is a dashboard application made with [Dash](https://dash.plotly.com/).
 
 The app collects and displays football data, providing insights and valuable information on various metrics. It is designed to practice multiple ETL (Extract, Transform, Load) processes using Python and RESTful APIs, and prepare the data for further analysis using machine learning models.
 
+App can be accessed here:
+
+https://fbtransfersdashboard.azurewebsites.net/
+
+
+
 ## Data Sources
 
 The data for this dashboard is obtained from:
